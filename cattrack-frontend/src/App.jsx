@@ -335,4 +335,39 @@ export default function App() {
           </div>
         )}
 
+        {/* --- VIEW: CATS EXPLORER --- */}
+        {currentPage === 'cats' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+             <div className="flex justify-between items-center">
+                <h3 className="text-xl font-black text-slate-800 tracking-tight italic uppercase">Global Cat Registry</h3>
+                {userRole === 'admin' && (
+                    <button onClick={() => { setEditId(null); setCatForm({nama:'', umur:'', jenis:''}); setShowModal({...showModal, cat: true}); }} className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 uppercase tracking-widest transition-all active:scale-95">
+                        <Plus size={18}/> Tambah Data Publik
+                    </button>
+                )}
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cats.map(cat => (
+                  <div key={cat.id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-2xl transition duration-500 group text-center border-t-4 border-blue-500">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-4 mx-auto group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                      <Cat size={32} />
+                    </div>
+                    <h4 className="text-xl font-black text-slate-800 tracking-tight mb-1">{cat.nama}</h4>
+                    <p className="text-[10px] font-black text-slate-400 mb-8 uppercase tracking-widest">{cat.jenis} • {cat.umur} Thn</p>
+                    <div className="flex gap-2">
+                        <button onClick={() => fetchCatDetails(cat)} className="flex-1 bg-slate-900 text-white font-black py-3 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg">Detail Data</button>
+                        {userRole === 'admin' && (
+                          <div className="flex gap-1">
+                            <button onClick={() => { setEditId(cat.id); setCatForm({nama: cat.nama, umur: cat.umur, jenis: cat.jenis}); setShowModal({...showModal, cat: true}); }} className="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100"><Pencil size={18} /></button>
+                            <button onClick={() => handleDeleteCat(cat.id)} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100"><Trash2 size={18} /></button>
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                ))}
+             </div>
+          </div>
+        )}
+
         
