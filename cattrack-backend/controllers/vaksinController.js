@@ -26,3 +26,20 @@ exports.create = async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
+// 4. PUT /api/vaksin/{id} (Mengupdate jadwal atau status)
+exports.update = async (req, res) => {
+    const { nama_vaksin, status, tanggal } = req.body;
+    try {
+        await db.query('UPDATE vaksin SET nama_vaksin=?, status=?, tanggal=? WHERE id=?', 
+            [nama_vaksin, status, tanggal, req.params.id]);
+        res.json({ message: 'Mengupdate jadwal vaksin atau status' });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+};
+
+// 5. DELETE /api/vaksin/{id} (Menghapus jadwal vaksin)
+exports.delete = async (req, res) => {
+    try {
+        await db.query('DELETE FROM vaksin WHERE id = ?', [req.params.id]);
+        res.json({ message: 'Menghapus jadwal vaksin' });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+};
