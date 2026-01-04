@@ -227,4 +227,64 @@ export default function App() {
     );
 }
 
-  
+  return (
+    <div className="min-h-screen bg-slate-50 flex font-sans">
+      {/* SIDEBAR */}
+      <aside className="w-64 bg-blue-900 text-white flex flex-col fixed h-full shadow-2xl z-30">
+        <div className="p-8 flex items-center gap-3 border-b border-blue-800 font-black">
+          <Cat className="text-blue-300" /> CatTrackPi
+        </div>
+        <nav className="flex-1 p-4 space-y-2">
+          <button onClick={() => { setCurrentPage('dashboard'); }} className={`w-full flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition ${currentPage === 'dashboard' ? 'bg-blue-600 shadow-lg' : 'hover:bg-blue-800'}`}>
+            <LayoutDashboard size={18}/> Dashboard
+          </button>
+          
+          {/* MENU CAT DATA API (Locked for User until valid) */}
+          <button 
+            disabled={userRole === 'user' && !isUnlocked}
+            onClick={() => setCurrentPage('cats')} 
+            className={`w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm transition ${currentPage === 'cats' || currentPage === 'details' ? 'bg-blue-600 shadow-lg' : 'hover:bg-blue-800'} ${userRole === 'user' && !isUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <div className="flex items-center gap-3"><List size={18}/> Cat Data API</div>
+            {userRole === 'user' && (isUnlocked ? <Unlock size={14} className="text-green-400"/> : <Lock size={14} className="text-slate-400"/>)}
+          </button>
+        </nav>
+        <button onClick={handleLogout} className="p-6 flex items-center gap-3 hover:bg-red-800 border-t border-blue-800 transition font-bold text-sm mt-auto"><LogOut size={18}/> Logout</button>
+      </aside>
+
+      <main className="ml-64 flex-1 p-10">
+        <header className="flex justify-between items-center mb-10">
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">{currentPage === 'dashboard' ? 'Developer Hub' : 'Explorer'}</h2>
+          <div className="flex items-center gap-3 bg-white p-2 pr-4 rounded-full shadow-sm border border-slate-100">
+             <div className="bg-blue-600 p-2 rounded-full text-white"><User size={16}/></div>
+             <div>
+                <p className="text-xs font-black text-slate-800 leading-none">{userName}</p>
+                <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">{userRole}</span>
+             </div>
+          </div>
+        </header>
+
+        {/* --- VIEW: DASHBOARD --- */}
+        {currentPage === 'dashboard' && (
+          <div className="max-w-4xl space-y-8 animate-in fade-in duration-500">
+            {/* JIKA ADMIN: Tampilkan Statistik */}
+            {userRole === 'admin' ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 border-b-8 border-blue-500 text-center">
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Total Cats</p>
+                        <p className="text-5xl font-black text-slate-800">{stats.total_kucing}</p>
+                    </div>
+                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 border-b-8 border-orange-500 text-center">
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Pending Vaccines</p>
+                        <p className="text-5xl font-black text-slate-800">{stats.vaksin_pending}</p>
+                    </div>
+                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 border-b-8 border-green-500 text-center">
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Daily Logs</p>
+                        <p className="text-5xl font-black text-slate-800">{stats.catatan_hari_ini}</p>
+                    </div>
+                    <div className="col-span-full bg-blue-900 p-10 rounded-[2rem] text-white shadow-2xl">
+                        <h3 className="text-2xl font-black mb-2 italic">Admin Panel Active 🚀</h3>
+                        <p className="text-blue-200">Anda memiliki akses penuh untuk mengelola database publik CatTrackPi.</p>
+                    </div>
+                </div>
+            ) : (
+                
