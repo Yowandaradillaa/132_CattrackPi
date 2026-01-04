@@ -370,4 +370,64 @@ export default function App() {
           </div>
         )}
 
-        
+        {/* --- VIEW: DETAILS --- */}
+        {currentPage === 'details' && selectedCat && (
+            <div className="max-w-5xl space-y-6 animate-in slide-in-from-bottom duration-500">
+                <button onClick={() => setCurrentPage('cats')} className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-widest hover:underline mb-4">
+                    <ArrowLeft size={14} /> Back to Database
+                </button>
+                <div className="bg-white p-10 rounded-[3rem] shadow-xl flex items-center gap-10 border-l-[15px] border-blue-600">
+                    <div className="bg-blue-50 p-8 rounded-[2rem] text-blue-600 shadow-inner"><Cat size={64} /></div>
+                    <div>
+                        <h3 className="text-5xl font-black text-slate-800 tracking-tighter mb-2">{selectedCat.nama}</h3>
+                        <p className="text-slate-400 font-black uppercase tracking-widest text-sm">{selectedCat.jenis} • {selectedCat.umur} Tahun</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="bg-white p-8 rounded-[3rem] shadow-lg border border-slate-100">
+                        <div className="flex justify-between items-center mb-8 border-b pb-6">
+                            <h4 className="font-black flex items-center gap-3 text-blue-900 uppercase text-xs tracking-widest"><ClipboardList size={22}/> Riwayat Catatan Perawatan</h4>
+                            {userRole === 'admin' && <button onClick={() => { setEditId(null); setCareForm({catatan:''}); setShowModal({...showModal, care: true}); }} className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 shadow-xl transition-transform hover:scale-110"><Plus size={24}/></button>}
+                        </div>
+                        <div className="space-y-4">
+                            {careNotes.length === 0 ? <p className="text-slate-300 text-center text-xs py-10 italic">Belum ada riwayat catatan perawatan.</p> :
+                                careNotes.map(note => (
+                                    <div key={note.id} className="p-6 bg-blue-50 rounded-[2rem] border-l-4 border-blue-500 shadow-sm relative group">
+                                        <div className="flex justify-between items-start">
+                                            <p className="text-slate-700 font-bold text-sm leading-relaxed">{note.catatan}</p>
+                                            {userRole === 'admin' && <button onClick={() => { setEditId(note.id); setCareForm({catatan: note.catatan}); setShowModal({...showModal, care: true}); }} className="text-slate-300 hover:text-blue-500 ml-2"><Pencil size={16}/></button>}
+                                        </div>
+                                        <p className="text-[10px] text-blue-400 font-black mt-4 uppercase tracking-tighter">{new Date(note.tanggal).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</p>
+                                    </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-[3rem] shadow-lg border border-slate-100">
+                        <div className="flex justify-between items-center mb-8 border-b pb-6">
+                            <h4 className="font-black flex items-center gap-3 text-orange-900 uppercase text-xs tracking-widest"><Syringe size={22}/> Status Vaksinasi</h4>
+                            {userRole === 'admin' && <button onClick={() => { setEditId(null); setVaccineForm({nama_vaksin:'', tanggal:''}); setShowModal({...showModal, vaccine: true}); }} className="bg-orange-600 text-white p-2 rounded-full hover:bg-orange-700 shadow-xl transition-transform hover:scale-110"><Plus size={24}/></button>}
+                        </div>
+                        <div className="space-y-4">
+                            {vaccines.length === 0 ? <p className="text-slate-300 text-center text-xs py-10 italic">Belum ada data vaksin.</p> :
+                                vaccines.map(v => (
+                                    <div key={v.id} className="flex justify-between items-center p-6 bg-orange-50 rounded-[2rem] border-l-4 border-orange-500 shadow-sm">
+                                        <div className="flex-1">
+                                            <p className="font-black text-slate-800 text-sm tracking-tight">{v.nama_vaksin}</p>
+                                            <p className="text-[10px] text-orange-500 font-black uppercase tracking-tighter mt-2">{new Date(v.tanggal).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm ${v.status === 'pending' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'}`}>{v.status}</span>
+                                            {userRole === 'admin' && <button onClick={() => { setEditId(v.id); setVaccineForm({nama_vaksin: v.nama_vaksin, tanggal: v.tanggal.split('T')[0]}); setShowModal({...showModal, vaccine: true}); }} className="text-slate-300 hover:text-orange-500"><Pencil size={16}/></button>}
+                                        </div>
+                                    </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+      </main>
+
+      
