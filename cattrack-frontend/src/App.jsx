@@ -19,4 +19,19 @@ export default function App() {
   const [careNotes, setCareNotes] = useState([]);
   const [vaccines, setVaccines] = useState([]);
   
+  // Form States
+  const [authForm, setAuthForm] = useState({ nama: '', email: '', password: '' });
+  const [catForm, setCatForm] = useState({ nama: '', umur: '', jenis: '' });
+  const [careForm, setCareForm] = useState({ catatan: '' });
+  const [vaccineForm, setVaccineForm] = useState({ nama_vaksin: '', tanggal: '' });
+
+  const [editId, setEditId] = useState(null);
+
+  // Explorer States
+  const [testKeyInput, setTestKeyInput] = useState('');
+  const [apiResponse, setApiResponse] = useState(null);
   
+  const [showModal, setShowModal] = useState({ cat: false, care: false, vaccine: false });
+  const [copied, setCopied] = useState(false);
+
+ 
