@@ -108,4 +108,37 @@ export default function App() {
     setApiResponse(null);
   };
 
-  
+  // Live Explorer (Enter to Unlock menu)
+  const handleExplorerRun = async (e) => {
+    if (e.key === 'Enter') {
+      if (!testKeyInput) return;
+      setApiResponse({ loading: "Validating API Key..." });
+      try {
+        const res = await axios.get('http://localhost:3000/api/kucing', { 
+          headers: { 'x-api-key': testKeyInput } 
+        });
+        
+        const metaData = userRole === 'admin' 
+          ? { status: 200, role: "SYSTEM_ADMINISTRATOR", access: "FULL_CONTROL" }
+          : { status: 200, role: "DEVELOPER_ACCESS", access: "READ_ONLY" };
+
+        setApiResponse({ ...metaData, data: res.data });
+        
+        // UNLOCK MENU jika sukses
+        setIsUnlocked(true);
+        localStorage.setItem('is_unlocked', 'true');
+        alert("API Key Valid! Menu Database Kucing telah dibuka.");
+      } catch (err) {
+        setApiResponse({ status: 401, error: "Unauthorized", message: "API Key Salah!" });
+        setIsUnlocked(userRole === 'admin'); // Admin tetap unlock
+      }
+    }
+  };
+
+  const copyKey = () => {
+    navigator.clipboard.writeText(localStorage.getItem('api_key'));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+ 
