@@ -287,4 +287,52 @@ export default function App() {
                     </div>
                 </div>
             ) : (
-                
+                /* JIKA USER: Tampilkan API Key & Explorer */
+                <>
+                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="font-black text-slate-800 flex items-center gap-2 text-sm"><Key size={18} className="text-blue-500"/> API KEY DEVELOPER ANDA</h3>
+                            <button onClick={copyKey} className="text-blue-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-1 hover:underline">
+                            {copied ? <><Check size={12}/> Copied</> : <><Copy size={12}/> Copy Key</>}
+                            </button>
+                        </div>
+                        <div className="bg-slate-900 text-blue-400 p-5 rounded-2xl font-mono text-sm break-all shadow-inner border border-slate-800 tracking-tighter">
+                            {localStorage.getItem('api_key')}
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100">
+                        <h3 className="font-black text-slate-800 text-sm mb-6 uppercase tracking-widest">Cara Menggunakan:</h3>
+                        <div className="space-y-4 text-xs text-slate-500 leading-relaxed font-bold">
+                            <p className="flex gap-3"><span className="text-blue-600">•</span>
+                                <span><b>Tambahkan Header Autentikasi:</b> Setiap request wajib menyertakan header <code className="bg-blue-50 px-1 rounded text-blue-600 font-black italic uppercase">x-api-key</code> dengan nilai API Key Anda di atas.</span>
+                            </p>
+                            <p className="flex gap-3"><span className="text-blue-600">•</span>
+                                <span><b>Gunakan Endpoint:</b><code className="bg-slate-100 px-2 py-0.5 rounded text-slate-800 font-bold tracking-tight">GET http://localhost:3000/api/kucing</code></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100">
+                        <h3 className="font-black text-slate-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-widest"><Terminal size={18} className="text-blue-500"/> Live API Explorer</h3>
+                        <p className="text-[10px] text-slate-400 mb-6 font-bold uppercase tracking-wider italic text-blue-500">Masukkan API Key & Tekan **Enter** Untuk Membuka Akses Database.</p>
+                        <input 
+                            type="text" placeholder="Paste API Key Anda di sini..." 
+                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 font-mono text-sm"
+                            value={testKeyInput} onChange={(e) => setTestKeyInput(e.target.value)} onKeyDown={handleExplorerRun}
+                        />
+                        <div className="mt-6 bg-[#1e293b] rounded-2xl shadow-2xl border border-slate-800 overflow-hidden">
+                            <div className="bg-slate-800 px-5 py-3 border-b border-slate-700 text-[9px] text-slate-400 font-black tracking-widest flex items-center gap-2 uppercase">
+                                <div className={`w-1.5 h-1.5 rounded-full ${isUnlocked ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}/> Server Response JSON
+                            </div>
+                            <div className="p-6 font-mono text-[11px] text-green-400 min-h-[150px] max-h-[400px] overflow-auto">
+                                {apiResponse ? <pre>{JSON.stringify(apiResponse, null, 2)}</pre> : <span className="text-slate-600 italic">// Masukkan API Key untuk melakukan validasi akses...</span>}
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+          </div>
+        )}
+
+        
