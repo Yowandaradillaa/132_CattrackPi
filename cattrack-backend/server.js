@@ -15,3 +15,17 @@ const perawatanRoutes = require('./routes/perawatanRoutes');
 const vaksinRoutes = require('./routes/vaksinRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
+// Gunakan Routes (URL sesuai PDF Anda)
+app.use('/api/auth', authRoutes);
+app.use('/api/kucing', kucingRoutes);
+app.use('/api/perawatan', perawatanRoutes);
+app.use('/api/vaksin', vaksinRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
+
+// Izinkan semua akses dari frontend
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server CatTrack Berjalan di http://localhost:${PORT}`);
+});
