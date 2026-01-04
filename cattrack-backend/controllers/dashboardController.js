@@ -37,3 +37,19 @@ exports.getStats = async (req, res) => {
     }
 };
 
+// 2. GET /api/dashboard/recent-notes (5 Terakhir)
+exports.getRecentNotes = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const [rows] = await db.query(
+            `SELECT p.*, k.nama as nama_kucing FROM perawatan p 
+             JOIN kucing k ON p.id_kucing = k.id 
+             WHERE k.user_id = ? 
+             ORDER BY p.tanggal DESC, p.id DESC LIMIT 5`, 
+            [userId]
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
