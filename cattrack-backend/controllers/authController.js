@@ -23,3 +23,26 @@ exports.register = async (req, res) => {
     }
 };
 
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        
+        if (users.length === 0 || !(await bcrypt.compare(password, users[0].password))) {
+            return res.status(401).json({ message: 'Email/Password Salah' });
+        }
+
+        res.json({ 
+            message: 'Login Berhasil', 
+            api_key: users[0].api_key, 
+            nama: users[0].nama,
+            role: users[0].role // Kirim role (admin/user) ke frontend
+        });
+    } catch (err) { 
+        res.status(500).json({ error: err.message }); 
+    }
+};
+
+exports.logout = (req, res) => {
+    res.json({ message: 'Logout berhasil' });
+};
