@@ -78,4 +78,34 @@ export default function App() {
     } catch (err) { console.error("Gagal load detail", err); }
   };
 
+  // --- 2. HANDLERS ---
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const endpoint = isRegister ? '/auth/register' : '/auth/login';
+      const res = await api.post(endpoint, authForm);
+      localStorage.setItem('api_key', res.data.api_key);
+      localStorage.setItem('user_name', res.data.nama); 
+      localStorage.setItem('user_role', res.data.role || 'user');
+      localStorage.setItem('login_time', Date.now());
+      
+      const role = res.data.role || 'user';
+      setUserName(res.data.nama);
+      setUserRole(role);
+      setIsUnlocked(role === 'admin'); // Admin otomatis unlocked
+      localStorage.setItem('is_unlocked', role === 'admin' ? 'true' : 'false');
+      
+      setCurrentPage('dashboard');
+      fetchDashboardData();
+    } catch (err) { alert("Login Gagal."); }
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsUnlocked(false);
+    setCurrentPage('login');
+    setSelectedCat(null);
+    setApiResponse(null);
+  };
+
   
