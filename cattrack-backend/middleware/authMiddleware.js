@@ -16,3 +16,14 @@ const authenticateApiKey = async (req, res, next) => {
     }
 };
 
+// Middleware tambahan untuk cek Role Admin
+const isAdmin = (req, res, next) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ 
+            message: 'Akses Ditolak: Hanya Admin yang dapat mengelola (CRUD) data publik CatTrackPi.' 
+        });
+    }
+    next();
+};
+
+module.exports = { authenticateApiKey, isAdmin };
