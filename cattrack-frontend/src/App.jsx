@@ -141,4 +141,90 @@ export default function App() {
     setTimeout(() => setCopied(false), 2000);
   };
 
- 
+  const handleSaveCat = async () => {
+    try {
+      if (editId) { await api.put(`/kucing/${editId}`, catForm); } 
+      else { await api.post('/kucing', catForm); }
+      setShowModal({ ...showModal, cat: false });
+      setEditId(null);
+      setCatForm({ nama: '', umur: '', jenis: '' });
+      fetchDashboardData();
+    } catch (err) { alert("Gagal menyimpan."); }
+  };
+
+  const handleDeleteCat = async (id) => {
+    if (window.confirm("Hapus data publik ini?")) {
+      try {
+        await api.delete(`/kucing/${id}`);
+        fetchDashboardData();
+      } catch (err) { alert("Gagal menghapus."); }
+    }
+  };
+
+  const handleSaveCare = async () => {
+    try {
+      if (editId) { await api.put(`/perawatan/${editId}`, { catatan: careForm.catatan, tanggal: new Date().toISOString().split('T')[0] }); }
+      else { await api.post('/perawatan', { id_kucing: selectedCat.id, catatan: careForm.catatan, tanggal: new Date().toISOString().split('T')[0] }); }
+      setShowModal({ ...showModal, care: false });
+      setEditId(null);
+      fetchCatDetails(selectedCat);
+    } catch (err) { alert("Gagal simpan."); }
+  };
+
+  const handleSaveVaccine = async () => {
+    try {
+      if (editId) { await api.put(`/vaksin/${editId}`, { nama_vaksin: vaccineForm.nama_vaksin, tanggal: vaccineForm.tanggal, status: 'pending' }); }
+      else { await api.post('/vaksin', { id_kucing: selectedCat.id, nama_vaksin: vaccineForm.nama_vaksin, tanggal: vaccineForm.tanggal, status: 'pending' }); }
+      setShowModal({ ...showModal, vaccine: false });
+      setEditId(null);
+      fetchCatDetails(selectedCat);
+    } catch (err) { alert("Gagal simpan."); }
+  };
+
+  if (currentPage === 'login') {
+    return (
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-10 w-full max-w-md border-t-8 border-blue-600 text-center">
+            <Cat className="w-14 h-14 text-blue-600 mx-auto mb-2" />
+            <h1 className="text-3xl font-bold text-gray-800 tracking-tighter">CatTrack<span className="text-blue-600">Pi</span></h1>
+            <p className="text-gray-400 text-sm mb-8 italic uppercase tracking-widest font-black">API Service Platform</p>
+          <form onSubmit={handleLogin} className="space-y-4">
+            {isRegister && (
+              <input 
+                type="text" 
+                placeholder="Nama Lengkap" 
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold" 
+                onChange={(e) => setAuthForm({...authForm, nama: e.target.value})} 
+                required 
+              />
+            )}
+            <input 
+              type="email" 
+              placeholder="Alamat Email" 
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold" 
+              onChange={(e) => setAuthForm({...authForm, email: e.target.value})} 
+              required 
+            />
+            <input 
+              type="password" 
+              placeholder="Kata Sandi" 
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold" 
+              onChange={(e) => setAuthForm({...authForm, password: e.target.value})} 
+              required 
+            />
+            
+            {/* Tombol yang sudah dinamis */}
+            <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-black hover:bg-blue-700 transition uppercase tracking-widest text-xs shadow-lg shadow-blue-100">
+                {isRegister ? 'Register' : 'Login'}
+            </button>
+          </form>
+          
+          <p className="text-center text-[10px] text-slate-400 mt-8 font-black uppercase tracking-widest cursor-pointer hover:text-blue-600 transition" onClick={() => setIsRegister(!isRegister)}>
+            {isRegister ? 'Sudah punya akun? Masuk di sini' : 'Belum punya akun? Daftar di sini'} 
+          </p>
+        </div>
+      </div>
+    );
+}
+
+  
