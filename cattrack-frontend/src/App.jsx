@@ -430,4 +430,20 @@ export default function App() {
         )}
       </main>
 
+      {/* MODALS (ADMIN ONLY) */}
+      {showModal.cat && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in zoom-in duration-200">
+          <div className="bg-white rounded-[3rem] p-12 w-full max-w-md shadow-2xl relative border-t-[12px] border-blue-600">
+            <button onClick={() => { setShowModal({...showModal, cat: false}); setEditId(null); }} className="absolute right-8 top-8 text-slate-300 hover:text-slate-500 transition-colors"><X size={24}/></button>
+            <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tighter italic uppercase">{editId ? 'Edit Data Kucing' : 'Publish Data Kucing'}</h3>
+            <div className="space-y-4 mt-8">
+              <input type="text" value={catForm.nama} placeholder="Cat Name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold" onChange={(e) => setCatForm({...catForm, nama: e.target.value})} />
+              <input type="text" value={catForm.jenis} placeholder="Breed / Type" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold" onChange={(e) => setCatForm({...catForm, jenis: e.target.value})} />
+              <input type="number" value={catForm.umur} placeholder="Age" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold" onChange={(e) => setCatForm({...catForm, umur: e.target.value})} />
+              <button onClick={handleSaveCat} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all mt-4">{editId ? 'Update Data Kucing' : 'Publish Data Kucing'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       
