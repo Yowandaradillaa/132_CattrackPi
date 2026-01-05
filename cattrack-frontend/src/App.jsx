@@ -153,7 +153,7 @@ export default function App() {
   };
 
   const handleDeleteCat = async (id) => {
-    if (window.confirm("Hapus data publik ini?")) {
+    if (window.confirm("Hapus data kucing ini?")) {
       try {
         await api.delete(`/kucing/${id}`);
         fetchDashboardData();
@@ -339,10 +339,10 @@ export default function App() {
         {currentPage === 'cats' && (
           <div className="space-y-8 animate-in fade-in duration-500">
              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-black text-slate-800 tracking-tight italic uppercase">Global Cat Registry</h3>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight italic uppercase">Data Kucing Publik</h3>
                 {userRole === 'admin' && (
                     <button onClick={() => { setEditId(null); setCatForm({nama:'', umur:'', jenis:''}); setShowModal({...showModal, cat: true}); }} className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 uppercase tracking-widest transition-all active:scale-95">
-                        <Plus size={18}/> Tambah Data Publik
+                        <Plus size={18}/> Tambah Data Kucing
                     </button>
                 )}
              </div>
