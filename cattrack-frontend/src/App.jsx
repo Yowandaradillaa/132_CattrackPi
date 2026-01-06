@@ -173,13 +173,25 @@ export default function App() {
 
   const handleSaveVaccine = async () => {
     try {
-      if (editId) { await api.put(`/vaksin/${editId}`, { nama_vaksin: vaccineForm.nama_vaksin, tanggal: vaccineForm.tanggal, status: 'pending' }); }
-      else { await api.post('/vaksin', { id_kucing: selectedCat.id, nama_vaksin: vaccineForm.nama_vaksin, tanggal: vaccineForm.tanggal, status: 'pending' }); }
+      const data = { 
+          nama_vaksin: vaccineForm.nama_vaksin, 
+          tanggal: vaccineForm.tanggal, 
+          status: vaccineForm.status || 'pending' // Ambil dari form
+      };
+      
+      if (editId) { 
+          await api.put(`/vaksin/${editId}`, data); 
+          alert("Status Vaksin Berhasil Diperbarui!");
+      } else { 
+          await api.post('/vaksin', { id_kucing: selectedCat.id, ...data }); 
+          alert("Jadwal Vaksin Berhasil Dibuat!");
+      }
+      
       setShowModal({ ...showModal, vaccine: false });
       setEditId(null);
       fetchCatDetails(selectedCat);
-    } catch (err) { alert("Gagal simpan."); }
-  };
+    } catch (err) { alert("Gagal menyimpan."); }
+};
 
   if (currentPage === 'login') {
     return (
@@ -449,7 +461,7 @@ export default function App() {
       {showModal.care && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in zoom-in duration-200">
           <div className="bg-white rounded-[3rem] p-12 w-full max-w-md shadow-2xl relative border-t-[12px] border-blue-600">
-            <h3 className="text-2xl font-black text-slate-800 mb-8 tracking-tighter text-center">{editId ? 'Edit Care Log' : 'Catatan Perawatan Baru'}</h3>
+            <h3 className="text-2xl font-black text-slate-800 mb-8 tracking-tighter text-center">{editId ? 'Edit Catatan Perawatan' : 'Catatan Perawatan Baru'}</h3>
             <textarea value={careForm.catatan} placeholder="Deskripsikan perawatan kucing..." className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold mb-6" rows="4" onChange={(e) => setCareForm({catatan: e.target.value})}></textarea>
             <div className="flex gap-4">
                 <button onClick={() => { setShowModal({...showModal, care: false}); setEditId(null); }} className="flex-1 text-slate-400 font-black uppercase text-[10px] tracking-widest">Batal</button>
@@ -466,6 +478,15 @@ export default function App() {
             <div className="space-y-4">
                 <input type="text" value={vaccineForm.nama_vaksin} placeholder="Nama Vaksin" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold" onChange={(e) => setVaccineForm({...vaccineForm, nama_vaksin: e.target.value})} />
                 <input type="date" value={vaccineForm.tanggal} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold" onChange={(e) => setVaccineForm({...vaccineForm, tanggal: e.target.value})} />
+                {/* Di dalam modal vaccine, sebelum tombol Simpan */}
+                <select 
+                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold mb-4"
+                    value={vaccineForm.status || 'pending'}
+                    onChange={(e) => setVaccineForm({...vaccineForm, status: e.target.value})}
+                >
+                    <option value="pending">Masih Menunggu (Pending)</option>
+                    <option value="selesai">Sudah Dilakukan (Selesai)</option>
+                </select>
                 <button onClick={handleSaveVaccine} className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-orange-700 transition mt-4">Save Data</button>
                 <button onClick={() => { setShowModal({...showModal, vaccine: false}); setEditId(null); }} className="w-full text-slate-400 font-black uppercase text-[10px] tracking-widest mt-2">Batal</button>
             </div>

@@ -3,30 +3,20 @@ const db = require('../config/db');
 // 1. GET /api/dashboard/stats
 exports.getStats = async (req, res) => {
     try {
-        const userId = req.user.id; // Diambil dari middleware auth
+        // 1. Hitung TOTAL SEMUA KUCING di database (Global)
+        const [kucing] = await db.query('SELECT COUNT(*) as total FROM kucing');
 
-        // Query untuk Total Kucing
-        const [kucing] = await db.query(
-            'SELECT COUNT(*) as total FROM kucing WHERE user_id = ?', 
-            [userId]
-        );
-
-        // Query untuk Vaksin Pending (harus join dengan tabel kucing untuk filter user_id)
+        // 2. Hitung TOTAL SEMUA VAKSIN PENDING di database (Global)
         const [vaksin] = await db.query(
-            `SELECT COUNT(*) as pending FROM vaksin v 
-             JOIN kucing k ON v.id_kucing = k.id 
-             WHERE k.user_id = ? AND v.status = 'pending'`, 
-            [userId]
+            "SELECT COUNT(*) as pending FROM vaksin WHERE status = 'pending'"
         );
 
-        // Query untuk Catatan Hari Ini (tanggal hari ini)
+        // 3. Hitung TOTAL SEMUA LOG PERAWATAN HARI INI (Global)
         const [catatan] = await db.query(
-            `SELECT COUNT(*) as hari_ini FROM perawatan p 
-             JOIN kucing k ON p.id_kucing = k.id 
-             WHERE k.user_id = ? AND p.tanggal = CURDATE()`, 
-            [userId]
+            "SELECT COUNT(*) as hari_ini FROM perawatan WHERE DATE(tanggal) = CURDATE()"
         );
 
+        // Kirim hasil asli dari database
         res.json({
             total_kucing: kucing[0].total,
             vaksin_pending: vaksin[0].pending,
