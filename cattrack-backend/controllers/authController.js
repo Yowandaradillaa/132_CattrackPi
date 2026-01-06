@@ -43,6 +43,13 @@ exports.login = async (req, res) => {
     }
 };
 
+exports.getAllUsers = async (req, res) => {
+    try {
+        const [rows] = await db.query('SELECT id, nama, email, role, api_key, created_at FROM users');
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+};
+
 exports.logout = (req, res) => {
     res.json({ message: 'Logout berhasil' });
 };

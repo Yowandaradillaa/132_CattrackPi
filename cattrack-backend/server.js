@@ -14,6 +14,7 @@ const kucingRoutes = require('./routes/kucingRoutes');
 const perawatanRoutes = require('./routes/perawatanRoutes');
 const vaksinRoutes = require('./routes/vaksinRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // Gunakan Routes (URL sesuai PDF Anda)
 app.use('/api/auth', authRoutes);
@@ -21,6 +22,7 @@ app.use('/api/kucing', kucingRoutes);
 app.use('/api/perawatan', perawatanRoutes);
 app.use('/api/vaksin', vaksinRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
 
 
 // Izinkan semua akses dari frontend
