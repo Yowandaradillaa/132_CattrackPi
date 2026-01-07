@@ -24,10 +24,13 @@ export default function App() {
   
   // Form States
   const [authForm, setAuthForm] = useState({ nama: '', email: '', password: '' });
-  const [catForm, setCatForm] = useState({ nama: '', umur: '', jenis: '' });
+  // Pastikan ada 'foto' dengan string kosong di awal
+const [catForm, setCatForm] = useState({ nama: '', umur: '', jenis: '', foto: '' });
   const [careForm, setCareForm] = useState({ catatan: '' });
   const [vaccineForm, setVaccineForm] = useState({ nama_vaksin: '', tanggal: '', status: 'pending' });
   const [userForm, setUserForm] = useState({ nama: '', email: '', password: '', role: 'user' });
+  
+
 
   const [editId, setEditId] = useState(null);
 
@@ -147,14 +150,26 @@ export default function App() {
 
   const handleSaveCat = async () => {
     try {
-      if (editId) { await api.put(`/kucing/${editId}`, catForm); } 
-      else { await api.post('/kucing', catForm); }
+      // Pastikan objek ini mengirim field 'foto'
+      const dataKucing = {
+        nama: catForm.nama,
+        umur: catForm.umur,
+        jenis: catForm.jenis,
+        foto: catForm.foto // <--- PENTING
+      };
+
+      if (editId) { 
+          await api.put(`/kucing/${editId}`, dataKucing); 
+      } else { 
+          await api.post('/kucing', dataKucing); 
+      }
+      
       setShowModal({ ...showModal, cat: false });
       setEditId(null);
-      setCatForm({ nama: '', umur: '', jenis: '' });
+      setCatForm({ nama: '', umur: '', jenis: '', foto: '' });
       fetchDashboardData();
     } catch (err) { alert("Gagal menyimpan."); }
-  };
+};
 
   const handleDeleteCat = async (id) => {
     if (window.confirm("Hapus data kucing publik ini?")) {
@@ -388,38 +403,65 @@ export default function App() {
           )}
 
           {/* --- VIEW: LIST KUCING --- */}
-          {currentPage === 'cats' && (
-            <div className="space-y-8 animate-in fade-in duration-500 font-sans">
-                <div className="flex justify-between items-center font-sans font-sans">
-                    <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase italic underline decoration-blue-500 decoration-4 underline-offset-8 font-sans font-sans font-sans">Data Kucing Publik</h3>
-                    {userRole === 'admin' && (
-                        <button onClick={() => { setEditId(null); setCatForm({nama:'', umur:'', jenis:''}); setShowModal({...showModal, cat: true}); }} className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 uppercase tracking-widest transition-all">
-                            <Plus size={18}/> Tambah Kucing
-                        </button>
-                    )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans font-sans">
-                    {cats.map(cat => (
-                    <div key={cat.id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-2xl transition duration-500 group text-center border-t-4 border-blue-500 font-sans">
-                        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-4 mx-auto group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm font-sans font-sans font-sans font-sans font-sans font-sans">
-                        <Cat size={32} />
-                        </div>
-                        <h4 className="text-xl font-black text-slate-800 tracking-tight mb-1 font-sans">{cat.nama}</h4>
-                        <p className="text-[10px] font-black text-slate-400 mb-8 uppercase tracking-widest font-sans font-sans font-sans font-sans font-sans font-sans font-sans">{cat.jenis} • {cat.umur} Tahun</p>
-                        <div className="flex gap-2 font-sans font-sans">
-                            <button onClick={() => fetchCatDetails(cat)} className="flex-1 bg-slate-900 text-white font-black py-3 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg font-sans font-sans font-sans font-sans">Detail Data</button>
-                            {userRole === 'admin' && (
-                            <div className="flex gap-1 font-sans font-sans">
-                                <button onClick={() => { setEditId(cat.id); setCatForm({nama: cat.nama, umur: cat.umur, jenis: cat.jenis}); setShowModal({...showModal, cat: true}); }} className="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors font-sans"><Pencil size={18} /></button>
-                                <button onClick={() => handleDeleteCat(cat.id)} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 transition-colors font-sans font-sans font-sans font-sans font-sans font-sans"><Trash2 size={18} /></button>
-                            </div>
-                            )}
-                        </div>
-                    </div>
-                    ))}
-                </div>
-            </div>
+{currentPage === 'cats' && (
+  <div className="space-y-8 animate-in fade-in duration-500 font-sans">
+      <div className="flex justify-between items-center font-sans">
+          <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase italic underline decoration-blue-500 decoration-4 underline-offset-8">Data Kucing Publik</h3>
+          {userRole === 'admin' && (
+              <button onClick={() => { setEditId(null); setCatForm({nama:'', umur:'', jenis:'', foto:''}); setShowModal({...showModal, cat: true}); }} className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 uppercase tracking-widest transition-all">
+                  <Plus size={18}/> Tambah Kucing
+              </button>
           )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+          {cats.map(cat => (
+          <div key={cat.id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-2xl transition duration-500 group text-center border-t-4 border-blue-500 font-sans">
+              
+              {/* REVISI: Menggunakan Foto dari URL, jika kosong tampilkan Icon Default */}
+              <div className="w-20 h-20 bg-blue-50 rounded-3xl overflow-hidden mb-4 mx-auto shadow-sm border-2 border-white group-hover:border-blue-500 transition-all">
+                {cat.foto ? (
+                  <img 
+                    src={cat.foto} 
+                    alt={cat.nama} 
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=No+Photo'; }} // Fallback jika link mati
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <Cat size={32} />
+                  </div>
+                )}
+              </div>
+
+              <h4 className="text-xl font-black text-slate-800 tracking-tight mb-1 font-sans">{cat.nama}</h4>
+              <p className="text-[10px] font-black text-slate-400 mb-8 uppercase tracking-widest font-sans">{cat.jenis} • {cat.umur} Tahun</p>
+              <div className="flex gap-2 font-sans">
+                  <button onClick={() => fetchCatDetails(cat)} className="flex-1 bg-slate-900 text-white font-black py-3 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg">Detail Data</button>
+                  {userRole === 'admin' && (
+                  <div className="flex gap-1 font-sans">
+                      
+<button onClick={() => { 
+    setEditId(cat.id); 
+    setCatForm({
+        nama: cat.nama, 
+        umur: cat.umur, 
+        jenis: cat.jenis, 
+        foto: cat.foto || '' // Pastikan foto lama ikut disalin ke form
+    }); 
+    setShowModal({...showModal, cat: true}); 
+}} 
+className="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors">
+    <Pencil size={18} />
+</button>
+                      <button onClick={() => handleDeleteCat(cat.id)} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 transition-colors font-sans"><Trash2 size={18} /></button>
+                  </div>
+                  )}
+              </div>
+          </div>
+          ))}
+      </div>
+  </div>
+)}
 
           {/* --- VIEW: DETAILS --- */}
           {currentPage === 'details' && selectedCat && (
@@ -482,19 +524,23 @@ export default function App() {
 
       {/* MODALS */}
       {showModal.cat && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in zoom-in duration-200 font-sans">
-          <div className="bg-white rounded-[3rem] p-12 w-full max-w-md shadow-2xl relative border-t-[12px] border-blue-600 font-sans">
-            <button onClick={() => { setShowModal({...showModal, cat: false}); setEditId(null); }} className="absolute right-8 top-8 text-slate-300 hover:text-slate-500 transition-colors font-sans font-sans"><X size={24}/></button>
-            <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tighter uppercase italic font-sans font-sans">{editId ? 'Edit Data Kucing' : 'Tambah Kucing'}</h3>
-            <div className="space-y-4 mt-8">
-              <input type="text" value={catForm.nama} placeholder="Nama Kucing" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, nama: e.target.value})} />
-              <input type="text" value={catForm.jenis} placeholder="Jenis / Ras" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, jenis: e.target.value})} />
-              <input type="number" value={catForm.umur} placeholder="Umur" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, umur: e.target.value})} />
-              <button onClick={handleSaveCat} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all mt-4 font-sans font-sans font-sans font-sans">{editId ? 'Perbarui Kucing' : 'Simpan Kucing'}</button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in zoom-in duration-200 font-sans">
+    <div className="bg-white rounded-[3rem] p-12 w-full max-w-md shadow-2xl relative border-t-[12px] border-blue-600 font-sans">
+      <button onClick={() => { setShowModal({...showModal, cat: false}); setEditId(null); }} className="absolute right-8 top-8 text-slate-300 hover:text-slate-500 transition-colors font-sans font-sans"><X size={24}/></button>
+      <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tighter uppercase italic font-sans font-sans">{editId ? 'Edit Data Kucing' : 'Tambah Kucing'}</h3>
+      <div className="space-y-4 mt-8">
+        <input type="text" value={catForm.nama} placeholder="Nama Kucing" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, nama: e.target.value})} />
+        <input type="text" value={catForm.jenis} placeholder="Jenis / Ras" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, jenis: e.target.value})} />
+        <input type="number" value={catForm.umur} placeholder="Umur" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, umur: e.target.value})} />
+        
+        {/* TAMBAHAN INPUT URL FOTO */}
+        <input type="text" value={catForm.foto} placeholder="URL Foto Kucing (https://...)" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold font-sans font-sans" onChange={(e) => setCatForm({...catForm, foto: e.target.value})} />
+        
+        <button onClick={handleSaveCat} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all mt-4 font-sans font-sans font-sans font-sans">{editId ? 'Perbarui Kucing' : 'Simpan Kucing'}</button>
+      </div>
+    </div>
+  </div>
+)}
 
       {showModal.user && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in zoom-in duration-200 font-sans">

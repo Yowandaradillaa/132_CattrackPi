@@ -19,20 +19,40 @@ exports.getById = async (req, res) => {
     }
 };
 
-// Hanya Admin yang bisa menambah, mengubah, dan menghapus
+// Tambah data kucing baru (Admin Only)
 exports.create = async (req, res) => {
-    const { nama, jenis, umur } = req.body;
-    await db.query('INSERT INTO kucing (user_id, nama, jenis, umur) VALUES (?, ?, ?, ?)', [req.user.id, nama, jenis, umur]);
-    res.json({ message: 'Data Kucing Publik Berhasil Ditambahkan (Admin Only)' });
+    const { nama, jenis, umur, foto } = req.body; // Tambah foto
+    try {
+        await db.query(
+            'INSERT INTO kucing (user_id, nama, jenis, umur, foto) VALUES (?, ?, ?, ?, ?)', 
+            [req.user.id, nama, jenis, umur, foto]
+        );
+        res.json({ message: 'Data Kucing Publik Berhasil Ditambahkan' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
+// Update data kucing (Admin Only)
 exports.update = async (req, res) => {
-    const { nama, jenis, umur } = req.body;
-    await db.query('UPDATE kucing SET nama=?, jenis=?, umur=? WHERE id=?', [nama, jenis, umur, req.params.id]);
-    res.json({ message: 'Data Kucing Publik Berhasil Diupdate' });
+    const { nama, jenis, umur, foto } = req.body; // Tambah foto
+    try {
+        await db.query(
+            'UPDATE kucing SET nama=?, jenis=?, umur=?, foto=? WHERE id=?', 
+            [nama, jenis, umur, foto, req.params.id]
+        );
+        res.json({ message: 'Data Kucing Publik Berhasil Diupdate' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
+// Hapus data kucing (Admin Only)
 exports.delete = async (req, res) => {
-    await db.query('DELETE FROM kucing WHERE id=?', [req.params.id]);
-    res.json({ message: 'Data Kucing Publik Berhasil Dihapus' });
+    try {
+        await db.query('DELETE FROM kucing WHERE id=?', [req.params.id]);
+        res.json({ message: 'Data Kucing Publik Berhasil Dihapus' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
