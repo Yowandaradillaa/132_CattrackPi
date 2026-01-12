@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cat, User, LogOut, Plus, Trash2, LayoutDashboard, List, Copy, Check, Terminal, Key, ArrowLeft, ClipboardList, Syringe, X, Pencil, Lock, Unlock, Users, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Cat, User, LogOut, Plus, Trash2, LayoutDashboard, List, Copy, Check, Terminal, Key, ArrowLeft, ClipboardList, Syringe, X, Pencil, Lock, Unlock, Users, AlertTriangle, CheckCircle2, Search } from 'lucide-react';
 import api from './api/axios'; 
 import axios from 'axios'; 
 
@@ -17,6 +17,7 @@ export default function App() {
   const [selectedCat, setSelectedCat] = useState(null);
   const [careNotes, setCareNotes] = useState([]);
   const [vaccines, setVaccines] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Form States
   const [authForm, setAuthForm] = useState({ nama: '', email: '', password: '' });
@@ -384,35 +385,73 @@ export default function App() {
           )}
 
           {/* --- VIEW: LIST KUCING --- */}
-          {currentPage === 'cats' && (
-            <div className="space-y-8 animate-in fade-in duration-500 font-sans">
-                <div className="flex justify-between items-center"><h3 className="text-xl font-black text-slate-800 tracking-tight uppercase italic underline decoration-blue-500 decoration-4 underline-offset-8">Basis Data Kucing Publik</h3>
-                {userRole === 'admin' && (
-                    <button onClick={() => { setEditId(null); setCatForm({nama:'', umur:'', jenis:'', foto:''}); setShowModal({...showModal, cat: true}); }} className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-700 shadow-lg uppercase tracking-widest font-sans font-sans font-sans font-sans"><Plus size={18}/> Tambah Kucing</button>
-                )}</div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
-                    {cats.map(cat => (
-                    <div key={cat.id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-2xl transition duration-500 group text-center border-t-4 border-blue-500 font-sans font-sans font-sans font-sans font-sans">
-                        <div className="w-20 h-20 bg-blue-50 rounded-3xl overflow-hidden mb-4 mx-auto shadow-sm border-2 border-white group-hover:border-blue-500 transition-all font-sans">
-                            {cat.foto ? <img src={cat.foto} alt={cat.nama} className="w-full h-full object-cover font-sans" onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=No+Photo'; }} /> :
-                            <div className="w-full h-full flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><Cat size={32} /></div>}
+{currentPage === 'cats' && (
+  <div className="space-y-8 animate-in fade-in duration-500 font-sans">
+      <div className="flex justify-between items-center font-sans">
+          <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase italic underline decoration-blue-500 decoration-4 underline-offset-8">Basis Data Kucing Publik</h3>
+          
+          <div className="flex gap-4">
+              {/* SEARCH BAR SIMPEL */}
+              <div className="relative font-sans">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input 
+                      type="text" 
+                      placeholder="Cari kucing..." 
+                      className="pl-12 pr-4 py-2.5 bg-white border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 shadow-sm font-bold text-xs"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+              </div>
+
+              {userRole === 'admin' && (
+                  <button onClick={() => { setEditId(null); setCatForm({nama:'', umur:'', jenis:'', foto:''}); setShowModal({...showModal, cat: true}); }} className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-blue-700 shadow-lg uppercase tracking-widest transition-all">
+                      <Plus size={18}/> Tambah Kucing
+                  </button>
+              )}
+          </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+          {/* MENGGUNAKAN MAP YANG SUDAH DIFILTER */}
+          {cats
+            .filter((cat) => (cat.nama || "").toLowerCase().includes(searchTerm.toLowerCase()))
+            .map(cat => (
+              <div key={cat.id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-2xl transition duration-500 group text-center border-t-4 border-blue-500 font-sans">
+                  <div className="w-20 h-20 bg-blue-50 rounded-3xl overflow-hidden mb-4 mx-auto shadow-sm border-2 border-white group-hover:border-blue-500 transition-all font-sans">
+                      {cat.foto ? (
+                        <img 
+                          src={cat.foto} 
+                          alt={cat.nama} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=No+Photo'; }} 
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                          <Cat size={32} />
                         </div>
-                        <h4 className="text-xl font-black text-slate-800 tracking-tight mb-1 font-sans">{cat.nama}</h4>
-                        <p className="text-[10px] font-black text-slate-400 mb-8 uppercase tracking-widest font-sans">{cat.jenis} • {cat.umur} Tahun</p>
-                        <div className="flex gap-2">
-                            <button onClick={() => fetchCatDetails(cat)} className="flex-1 bg-slate-900 text-white font-black py-3 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg font-sans">Detail Data</button>
-                            {userRole === 'admin' && (
-                              <div className="flex gap-1 font-sans font-sans">
-                                <button onClick={() => { setEditId(cat.id); setCatForm({nama: cat.nama, umur: cat.umur, jenis: cat.jenis, foto: cat.foto}); setShowModal({...showModal, cat: true}); }} className="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors font-sans"><Pencil size={18} /></button>
-                                <button onClick={() => triggerDeleteCat(cat.id)} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 transition-colors font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><Trash2 size={18} /></button>
-                              </div>
-                            )}
+                      )}
+                  </div>
+                  <h4 className="text-xl font-black text-slate-800 tracking-tight mb-1 font-sans">{cat.nama}</h4>
+                  <p className="text-[10px] font-black text-slate-400 mb-8 uppercase tracking-widest font-sans">{cat.jenis} • {cat.umur} Tahun</p>
+                  <div className="flex gap-2">
+                      <button onClick={() => fetchCatDetails(cat)} className="flex-1 bg-slate-900 text-white font-black py-3 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg font-sans">Detail Data</button>
+                      {userRole === 'admin' && (
+                        <div className="flex gap-1 font-sans">
+                          <button 
+                            onClick={() => { setEditId(cat.id); setCatForm({nama: cat.nama, umur: cat.umur, jenis: cat.jenis, foto: cat.foto}); setShowModal({...showModal, cat: true}); }} 
+                            className="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors font-sans"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button onClick={() => triggerDeleteCat(cat.id)} className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 transition-colors font-sans"><Trash2 size={18} /></button>
                         </div>
-                    </div>
-                    ))}
-                </div>
-            </div>
-          )}
+                      )}
+                  </div>
+              </div>
+          ))}
+      </div>
+  </div>
+)}
 
           {/* --- VIEW: DETAILS --- */}
           {currentPage === 'details' && selectedCat && (
