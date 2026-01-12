@@ -13,7 +13,7 @@ exports.getStats = async (req, res) => {
 
         // 3. Hitung TOTAL SEMUA LOG PERAWATAN HARI INI (Global)
         const [catatan] = await db.query(
-            "SELECT COUNT(*) as hari_ini FROM perawatan WHERE DATE(tanggal) = CURDATE()"
+            "SELECT COUNT(*) as hari_ini FROM perawatan WHERE DATE(created_at) = CURDATE()"
         );
 
         // Kirim hasil asli dari database
