@@ -170,14 +170,30 @@ export default function App() {
 
   const handleSaveUser = async () => {
     try {
-        if (editId) { await api.put(`/users/${editId}`, userForm); } 
-        else { await api.post('/users', userForm); }
+        // Buat data kiriman TANPA password untuk proses EDIT
+        const payload = { 
+            nama: userForm.nama, 
+            email: userForm.email, 
+            role: userForm.role 
+        };
+
+        if (editId) {
+            // Proses EDIT: Kirim id di URL dan payload tanpa password
+            await api.put(`/users/${editId}`, payload);
+        } else {
+            // Proses TAMBAH BARU: Tetap kirim userForm lengkap (ada password)
+            await api.post('/users', userForm);
+        }
+
         setShowModal({ ...showModal, user: false });
-        setEditId(null);
-        fetchUsers();
-        setSuccessModal({ show: true, message: 'Data pengembang berhasil disimpan.' });
-    } catch (err) { alert("Gagal."); }
-  };
+        setEditId(null); // Reset ID edit
+        fetchUsers(); // Refresh daftar user
+        setSuccessModal({ show: true, message: 'Data pengembang berhasil diperbarui!' });
+    } catch (err) { 
+        console.error(err);
+        alert("Gagal menyimpan data user."); 
+    }
+};
 
   const triggerDeleteUser = (id) => {
     setConfirmModal({

@@ -28,12 +28,17 @@ exports.createUser = async (req, res) => {
 // 3. Update User (Nama/Email/Role)
 exports.updateUser = async (req, res) => {
     const { nama, email, role } = req.body;
+    const { id } = req.params;
     try {
-        await db.query('UPDATE users SET nama=?, email=?, role=? WHERE id=?', [nama, email, role, req.params.id]);
+        // Urutan: nama(1), email(2), role(3) WHERE id(4)
+        const sql = 'UPDATE users SET nama = ?, email = ?, role = ? WHERE id = ?';
+        await db.query(sql, [nama, email, role, id]); // ID harus di paling terakhir
+        
         res.json({ message: 'User berhasil diperbarui' });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
-
 // 4. Hapus User
 exports.deleteUser = async (req, res) => {
     try {
