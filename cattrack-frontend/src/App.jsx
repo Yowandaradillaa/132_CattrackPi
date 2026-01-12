@@ -214,14 +214,29 @@ export default function App() {
 
   const handleSaveCare = async () => {
     try {
-      if (editId) { await api.put(`/perawatan/${editId}`, { catatan: careForm.catatan, tanggal: new Date().toISOString().split('T')[0] }); }
-      else { await api.post('/perawatan', { id_kucing: selectedCat.id, catatan: careForm.catatan, tanggal: new Date().toISOString().split('T')[0] }); }
+      const data = { 
+        catatan: careForm.catatan, 
+        tanggal: new Date().toISOString().split('T')[0] 
+      };
+
+      if (editId) { 
+        await api.put(`/perawatan/${editId}`, data); 
+      } else { 
+        await api.post('/perawatan', { id_kucing: selectedCat.id, ...data }); 
+      }
+
       setShowModal({ ...showModal, care: false });
       setEditId(null);
-      fetchCatDetails(selectedCat);
-      setSuccessModal({ show: true, message: 'Catatan perawatan berhasil disimpan.' });
-    } catch (err) { alert("Gagal."); }
-  };
+      
+      // PENTING: Panggil dua fungsi ini agar data di detail DAN dashboard berubah
+      fetchCatDetails(selectedCat); 
+      fetchDashboardData(); // <--- BARIS INI YANG BIKIN ANGKA DI DASHBOARD UPDATE
+      
+      setSuccessModal({ show: true, message: 'Catatan perawatan disimpan!' });
+    } catch (err) { 
+      alert("Gagal simpan."); 
+    }
+};
 
   const handleSaveVaccine = async () => {
     try {
