@@ -225,15 +225,27 @@ export default function App() {
 
   const handleSaveVaccine = async () => {
     try {
-      const data = { nama_vaksin: vaccineForm.nama_vaksin, tanggal: vaccineForm.tanggal, status: vaccineForm.status };
-      if (editId) { await api.put(`/vaksin/${editId}`, data); }
-      else { await api.post('/vaksin', { id_kucing: selectedCat.id, ...data }); }
+      const payload = { 
+          nama_vaksin: vaccineForm.nama_vaksin, 
+          tanggal: vaccineForm.tanggal, // Pastikan formatnya YYYY-MM-DD
+          status: vaccineForm.status 
+      };
+      
+      if (editId) { 
+          await api.put(`/vaksin/${editId}`, payload); 
+      } else { 
+          await api.post('/vaksin', { id_kucing: selectedCat.id, ...payload }); 
+      }
+      
       setShowModal({ ...showModal, vaccine: false });
       setEditId(null);
-      fetchCatDetails(selectedCat);
-      setSuccessModal({ show: true, message: 'Informasi vaksin berhasil diperbarui.' });
-    } catch (err) { alert("Gagal."); }
-  };
+      fetchCatDetails(selectedCat); // Tarik data terbaru
+      setSuccessModal({ show: true, message: 'Data vaksin berhasil diperbarui!' });
+    } catch (err) { 
+        console.error(err);
+        alert("Gagal simpan vaksin."); 
+    }
+};
 
   // --- 3. UI RENDER ---
   if (currentPage === 'login') {

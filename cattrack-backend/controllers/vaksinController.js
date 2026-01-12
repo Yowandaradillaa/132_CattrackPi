@@ -29,11 +29,30 @@ exports.create = async (req, res) => {
 // 4. PUT /api/vaksin/{id} (Mengupdate jadwal atau status)
 exports.update = async (req, res) => {
     const { nama_vaksin, status, tanggal } = req.body;
+    const { id } = req.params;
+
     try {
-        await db.query('UPDATE vaksin SET nama_vaksin=?, status=?, tanggal=? WHERE id=?', 
-            [nama_vaksin, status, tanggal, req.params.id]);
-        res.json({ message: 'Mengupdate jadwal vaksin atau status' });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+        // LOGIKA OTOMATIS: Cek apakah tanggal sudah terlewat
+        let statusFinal = status;
+        const tanggalInput = new Date(tanggal);
+        const hariIni = new Date();
+        hariIni.setHours(0, 0, 0, 0); // Reset jam agar hanya membandingkan tanggal
+
+        if (tanggalInput < hariIni) {
+            statusFinal = 'selesai'; // Otomatis selesai jika sudah lewat hari
+        }
+
+        // Query Update
+        const sql = 'UPDATE vaksin SET nama_vaksin = ?, status = ?, tanggal = ? WHERE id = ?';
+        await db.query(sql, [nama_vaksin, statusFinal, tanggal, id]);
+
+        res.json({ 
+            message: 'Data vaksin berhasil diperbarui', 
+            status_akhir: statusFinal 
+        });
+    } catch (err) { 
+        res.status(500).json({ error: err.message }); 
+    }
 };
 
 // 5. DELETE /api/vaksin/{id} (Menghapus jadwal vaksin)
