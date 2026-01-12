@@ -20,10 +20,22 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
     const { id_kucing, nama_vaksin, status, tanggal } = req.body;
     try {
-        await db.query('INSERT INTO vaksin (id_kucing, nama_vaksin, status, tanggal) VALUES (?, ?, ?, ?)', 
-            [id_kucing, nama_vaksin, status || 'pending', tanggal]);
-        res.status(201).json({ message: 'Menambahkan jadwal vaksin baru' });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+        // Logika Otomatis: Jika tanggal input < hari ini, status otomatis 'selesai'
+        let statusFinal = status || 'pending';
+        const tglInput = new Date(tanggal).setHours(0,0,0,0);
+        const tglHariIni = new Date().setHours(0,0,0,0);
+
+        if (tglInput < tglHariIni) {
+            statusFinal = 'selesai';
+        }
+
+        const sql = 'INSERT INTO vaksin (id_kucing, nama_vaksin, status, tanggal) VALUES (?, ?, ?, ?)';
+        await db.query(sql, [id_kucing, nama_vaksin, statusFinal, tanggal]);
+        
+        res.status(201).json({ message: 'Jadwal vaksin berhasil ditambahkan' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 // 4. PUT /api/vaksin/{id} (Mengupdate jadwal atau status)
